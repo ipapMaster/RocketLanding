@@ -32,14 +32,33 @@ class RocketGame:
         self.y = 50  # Текущая координата верхней точки ракеты
         self.velocity = 0.0  # Скорость падения (изначально стоим)
 
+        # Состояние двигателя
+        self.is_engine_on = False
+
+        # Слушаем клавиатуру
+        self.root.bind('<KeyPress-Up>', self.engine_on)
+        self.root.bind('<KeyRelease-Up>', self.engine_off)
+
         # Игровой цикл
         self.update_game()
 
     # Главный цикл игры
     def update_game(self):
-        self.velocity += GRAVITY  # Увеличиваем скорость падения
+        if self.is_engine_on:
+            self.velocity -= THRUST
+        else:
+            self.velocity += GRAVITY  # Увеличиваем скорость падения
+
         self.y += self.velocity  # Изменяем координату Y для ракеты
         self.canvas.move(self.rocket, 0, self.velocity)
 
         # Вызываем update_game каждые 20 миллисекунд
         self.root.after(20, self.update_game)
+
+    def engine_on(self, event):
+        self.is_engine_on = True
+        # print(f'Имя клавиши: {event.keysym}')
+        # print(f'Код клавиши: {event.keycode}')
+
+    def engine_off(self, event):
+        self.is_engine_on = False
