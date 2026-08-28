@@ -22,6 +22,7 @@ class RocketGame:
             fill='#16a085'
         )
 
+        # Сама ракета
         self.rocket = self.canvas.create_rectangle(
             WIDTH // 2 - 10, 50,
             WIDTH // 2 + 10, 90,
@@ -35,6 +36,16 @@ class RocketGame:
         # Состояние двигателя
         self.is_engine_on = False
 
+        # Игра запущена? Игровой цикл активен?
+        self.is_game_run = True
+
+        # Параметры текста
+        self.text_status = self.canvas.create_text(
+            WIDTH // 2, HEIGHT // 2,
+            anchor='center', fill='yellow',
+            font=('Arial', 16)
+        )
+
         # Слушаем клавиатуру
         self.root.bind('<KeyPress-Up>', self.engine_on)
         self.root.bind('<KeyRelease-Up>', self.engine_off)
@@ -44,6 +55,9 @@ class RocketGame:
 
     # Главный цикл игры
     def update_game(self):
+        if not self.is_game_run:
+            return
+
         if self.is_engine_on:
             self.velocity -= THRUST
         else:
@@ -52,13 +66,39 @@ class RocketGame:
         self.y += self.velocity  # Изменяем координату Y для ракеты
         self.canvas.move(self.rocket, 0, self.velocity)
 
+        # Проверка столкновения с землёй
+        rocket_bottom = self.y + 40
+
+        if rocket_bottom >= HEIGHT - 20:
+            self.is_game_run = False  # Стоп-игра
+            self.check_landing()  # Проверяем скорость встречи с землёй
+            return
+
         # Вызываем update_game каждые 20 миллисекунд
         self.root.after(20, self.update_game)
 
     def engine_on(self, event):
-        self.is_engine_on = True
+        if self.is_game_run:  # Двигатель работает пока игра активна
+            self.is_engine_on = True
         # print(f'Имя клавиши: {event.keysym}')
         # print(f'Код клавиши: {event.keycode}')
 
     def engine_off(self, event):
         self.is_engine_on = False
+
+    def check_landing(self):
+        if self.velocity <= SAFE_SPEED:
+            self.canvas.itemconfig(
+                self.text_status,
+                text=f'Успешная посадка:\n Скорость: {self.velocity:.2f}',
+                fill='#2ecc71'
+            )
+        else:
+            self.canvas.itemconfig(
+                self.rocket, fill='black'
+            )  # Успешная посадка
+            self.canvas.itemconfig(
+                self.text_status,
+                text=f'Крушение:\n Скорость высока: {self.velocity:.2f}',
+                fill='#e74c3c'
+            )  # Ракета почернела - сгорела
