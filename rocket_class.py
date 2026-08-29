@@ -12,21 +12,21 @@ class RocketGame:
         self.canvas = Canvas(root,
                              width=WIDTH,
                              height=HEIGHT,
-                             bg='#1a1a2e')
+                             bg=DARK_SKY)
         self.canvas.pack()
 
         # Добавим землю
         self.canvas.create_rectangle(
             0, HEIGHT - 20,
             WIDTH, HEIGHT,
-            fill='#16a085'
+            fill=TERRAIN
         )
 
         # Сама ракета
         self.rocket = self.canvas.create_rectangle(
             WIDTH // 2 - 10, 50,
             WIDTH // 2 + 10, 90,
-            fill='#e74c3c'
+            fill=RED
         )
 
         # Добавим физику
@@ -91,7 +91,7 @@ class RocketGame:
             self.canvas.itemconfig(
                 self.text_status,
                 text=f'Успешная посадка:\n Скорость: {self.velocity:.2f}',
-                fill='#2ecc71'
+                fill=GREEN
             )
         else:
             self.canvas.itemconfig(
@@ -100,5 +100,5 @@ class RocketGame:
             self.canvas.itemconfig(
                 self.text_status,
                 text=f'Крушение:\n Скорость высока: {self.velocity:.2f}',
-                fill='#e74c3c'
+                fill=RED
             )  # Ракета почернела - сгорела
